@@ -22,6 +22,7 @@ configurations {
 
 repositories {
 	mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
@@ -34,6 +35,9 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-redis-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation 'redis.clients:jedis'
+    implementation 'org.springframework.data:spring-data-redis'
+//    implementation 'com.example:Vahak-EntityService:0.0.3'
 }
 
 tasks.named('test') {
