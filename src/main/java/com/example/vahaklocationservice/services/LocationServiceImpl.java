@@ -1,12 +1,14 @@
 package com.example.vahaklocationservice.services;
 
 import com.example.vahaklocationservice.dto.DriverLocationDto;
+import com.example.vahaklocationservice.dto.NearbyDriversRequestDTO;
 import org.springframework.data.geo.*;
 import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.core.GeoOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,14 +42,19 @@ public class LocationServiceImpl implements LocationService{
     }
 
     @Override
-    public List<DriverLocationDto> getNearByDrivers(Double longitude, Double latitude) {
+    public List<DriverLocationDto> getNearByDrivers(NearbyDriversRequestDTO nearbyDriversRequestDTO) {
+
         GeoOperations<String, String> geoOps = stringRedisTemplate.opsForGeo();
         Distance radius = new Distance(SEARCH_RADIUS, Metrics.KILOMETERS);
-        Circle within = new Circle(new Point(longitude, latitude), radius);
+        Circle within = new Circle(new Point(nearbyDriversRequestDTO.getLongitude(), nearbyDriversRequestDTO.getLatitude()), radius);
 
         GeoResults<RedisGeoCommands.GeoLocation<String>> results = geoOps.radius(DRIVER_GEO_OPS_KEY, within);
+
         List<DriverLocationDto> drivers = new ArrayList<>();
         for(GeoResult<RedisGeoCommands.GeoLocation<String>> result : results){
+            Boolean wasReserved = reserveTheDriver(Long.valueOf(result.getContent().getName()), nearbyDriversRequestDTO.getBookingId());
+            if(!wasReserved) continue;
+
             Point point = geoOps.position(DRIVER_GEO_OPS_KEY, result.getContent().getName()).getFirst();
             DriverLocationDto driverLocation = DriverLocationDto.builder()
                     .driverId(result.getContent().getName())
@@ -57,5 +64,16 @@ public class LocationServiceImpl implements LocationService{
             drivers.add(driverLocation);
         }
         return drivers;
+    }
+
+    public Boolean reserveTheDriver(Long driverId, Long bookingId){
+        Boolean success =
+                stringRedisTemplate.opsForValue()
+                        .setIfAbsent(
+                                "reservation:driver:"+driverId.toString(),
+                                bookingId.toString(),
+                                Duration.ofSeconds(60)
+                        );
+        return success;
     }
 }

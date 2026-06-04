@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NearbyDriversRequestDTO {
+    private Long bookingId;  // this is to reserve the drivers with bookingId
     private Double latitude;
     private Double longitude;
 }

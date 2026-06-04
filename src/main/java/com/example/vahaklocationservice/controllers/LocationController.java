@@ -29,6 +29,7 @@ public class LocationController {
     @PostMapping("/drivers")
     public ResponseEntity<Boolean> saveDriverLocation(@RequestBody SaveDriverLocationRequestDto saveDriverLocationRequestDto){
         try{
+            System.out.println("Hiii");
             Boolean response = locationService.saveDriverLocation(
                     saveDriverLocationRequestDto.getDriverId(),
                     saveDriverLocationRequestDto.getLongitude(),
@@ -41,10 +42,11 @@ public class LocationController {
         }
     }
 
-    @GetMapping("/nearby/drivers")
+    /* Change GET -> POST, coz GET cant have body in retrofit */
+    @PostMapping("/nearby/drivers")
     public ResponseEntity<List<DriverLocationDto>> getNearByDrivers(@RequestBody NearbyDriversRequestDTO nearbyDriversRequestDTO){
         try{
-            List<DriverLocationDto> drivers = locationService.getNearByDrivers(nearbyDriversRequestDTO.getLongitude(), nearbyDriversRequestDTO.getLatitude());
+            List<DriverLocationDto> drivers = locationService.getNearByDrivers(nearbyDriversRequestDTO);
 
             return new ResponseEntity<>(drivers, HttpStatus.OK);
         } catch (Exception e) {
