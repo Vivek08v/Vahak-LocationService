@@ -49,7 +49,9 @@ dependencies {
     implementation 'org.springframework.data:spring-data-redis'
     // Source: https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-netflix-eureka-client
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-//    implementation 'com.example:Vahak-EntityService:0.0.3'
+    implementation 'com.example:Vahak-EntityService:0.0.5'
+
+    implementation 'org.springframework.kafka:spring-kafka:4.0.4'
 }
 
 tasks.named('test') {

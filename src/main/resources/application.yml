@@ -13,6 +13,14 @@ server:
 spring:
   application:
     name: Vahak-LocationService
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.JacksonJsonSerializer
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.JacksonJsonDeserializer
 
 eureka:
   client:
