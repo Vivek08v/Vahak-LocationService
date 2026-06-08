@@ -1,6 +1,7 @@
 package com.example.vahaklocationservice.consumers;
 
 import com.example.vahaklocationservice.dto.UnreserveAndStatusUpdateDTO;
+import com.example.vahaklocationservice.services.LocationService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
@@ -8,6 +9,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class KafkaConsumerService {
+
+    private final LocationService locationService;
+
+    public KafkaConsumerService(LocationService locationService){
+        this.locationService = locationService;
+    }
 
     @KafkaListener(topics = "sample-topic", groupId = "sample-group-1")
     public void listen(String message){
@@ -25,7 +32,7 @@ public class KafkaConsumerService {
             concurrency = "2"
     )
     public void listen(UnreserveAndStatusUpdateDTO unreserveAndStatusUpdateDTO, @Header(KafkaHeaders.RECEIVED_PARTITION) int partition) {
-
+        locationService.unreserveTheDriver(unreserveAndStatusUpdateDTO.getDriverId(), unreserveAndStatusUpdateDTO.getBookingId());
         // Do the task here to unreserve and status updation
         System.out.println(
                 Thread.currentThread().getName()
