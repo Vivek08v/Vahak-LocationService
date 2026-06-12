@@ -12,4 +12,6 @@ public class NearbyDriversRequestDTO {
     private Long bookingId;  // this is to reserve the drivers with bookingId
     private Double latitude;
     private Double longitude;
+    private Double endLatitude;
+    private Double endLongitude;
 }

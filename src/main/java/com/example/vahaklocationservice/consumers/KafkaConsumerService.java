@@ -1,5 +1,6 @@
 package com.example.vahaklocationservice.consumers;
 
+import com.example.vahaklocationservice.dto.RejectingDriverDto;
 import com.example.vahaklocationservice.dto.UnreserveAndStatusUpdateDTO;
 import com.example.vahaklocationservice.services.LocationService;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -21,24 +22,22 @@ public class KafkaConsumerService {
         System.out.println("Consumer 'sample-group-1' is listening the message: "+message);
     }
 
-//    @KafkaListener(topics = "sample-topic", groupId = "sample-group-2", concurrency = "2")
-//    public void listen2(String message){
-//        System.out.println("Consumer 'sample-group-2' is listening the message: "+message);
-//    }
 
-    @KafkaListener(
-            topics = "unreserve-update-booking-topic",
-            groupId = "sample-group-12",
-            concurrency = "2"
-    )
+    @KafkaListener(topics = "unreserve-update-booking-topic", groupId = "sample-group-12", concurrency = "2")
     public void listen(UnreserveAndStatusUpdateDTO unreserveAndStatusUpdateDTO, @Header(KafkaHeaders.RECEIVED_PARTITION) int partition) {
         locationService.unreserveTheDriver(unreserveAndStatusUpdateDTO.getDriverId(), unreserveAndStatusUpdateDTO.getBookingId());
-        // Do the task here to unreserve and status updation
+
         System.out.println(
                 Thread.currentThread().getName()
                         + " Partition=" + partition
                         + " Message=" + unreserveAndStatusUpdateDTO.toString()
                         + " Booking Id:" + unreserveAndStatusUpdateDTO.getBookingId()
         );
+    }
+
+
+    @KafkaListener(topics = "rejecting-driver-topic", groupId = "sample-group-13", containerFactory = "kafkaListenerContainerFactory1")
+    public void updateStatusFromRedisOfRejectingDriver(RejectingDriverDto rejectingDriverDto){
+        locationService.rejectTheBooking(rejectingDriverDto);
     }
 }

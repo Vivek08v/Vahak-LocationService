@@ -2,6 +2,7 @@ package com.example.vahaklocationservice.services;
 
 import com.example.vahaklocationservice.dto.DriverLocationDto;
 import com.example.vahaklocationservice.dto.NearbyDriversRequestDTO;
+import com.example.vahaklocationservice.dto.RejectingDriverDto;
 import com.example.vahaklocationservice.dto.SaveDriverDetailsDto;
 
 import java.util.List;
@@ -17,4 +18,6 @@ public interface LocationService {
     Boolean reserveTheDriver(List<DriverLocationDto> drivers, Long bookingId);
 
     Boolean unreserveTheDriver(Long driverId, Long bookingId);
+
+    Boolean rejectTheBooking(RejectingDriverDto rejectingDriverDto);
 }

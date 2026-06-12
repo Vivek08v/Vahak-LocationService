@@ -3,6 +3,7 @@ package com.example.vahaklocationservice.services;
 import com.example.vahakentityservice.models.BookingStatus;
 import com.example.vahaklocationservice.dto.DriverLocationDto;
 import com.example.vahaklocationservice.dto.NearbyDriversRequestDTO;
+import com.example.vahaklocationservice.dto.RejectingDriverDto;
 import com.example.vahaklocationservice.dto.SaveDriverDetailsDto;
 import org.springframework.data.geo.*;
 import org.springframework.data.redis.connection.RedisGeoCommands;
@@ -142,6 +143,7 @@ public class LocationServiceImpl implements LocationService{
     public Boolean unreserveTheDriver(Long driverId, Long bookingId){
 
         try{
+            System.out.println("Hello: "+driverId+" "+bookingId);
             Set<String> reservedDrivers = stringRedisTemplate.opsForSet()
                     .members("location:reservation:booking:" + bookingId);
             stringRedisTemplate.delete("location:reservation:booking:" + bookingId);
@@ -162,6 +164,19 @@ public class LocationServiceImpl implements LocationService{
             );
         } catch (Exception e) {
             System.out.println("Error in unreserveTheDrivers: "+e);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public Boolean rejectTheBooking(RejectingDriverDto rejectingDriverDto){
+        try{
+            stringRedisTemplate.delete("location:reservation:driver:"+rejectingDriverDto.getDriverId());
+            stringRedisTemplate.opsForSet().remove("location:reservation:booking:" + rejectingDriverDto.getBookingId(),
+                    rejectingDriverDto.getDriverId());
+        } catch (Exception e) {
+            System.out.println("Error in rejectTheBooking :" +e);
             return false;
         }
         return true;

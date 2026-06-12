@@ -1,5 +1,6 @@
 package com.example.vahaklocationservice.configurations;
 
+import com.example.vahaklocationservice.dto.RejectingDriverDto;
 import com.example.vahaklocationservice.dto.UnreserveAndStatusUpdateDTO;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -73,6 +74,33 @@ public class KafkaConfig {
     public ConcurrentKafkaListenerContainerFactory<String, UnreserveAndStatusUpdateDTO> kafkaListenerContainerFactory(){
         ConcurrentKafkaListenerContainerFactory<String, UnreserveAndStatusUpdateDTO> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactoryUnreserve());
+        return factory;
+    }
+
+    @Bean
+    public ConsumerFactory<String, RejectingDriverDto> consumerFactoryRejectingDrivers(){
+        Map<String, Object> configProps = new HashMap<>();
+        configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        configProps.put(ConsumerConfig.GROUP_ID_CONFIG, "sample-group");
+//        configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+//        configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JacksonJsonDeserializer.class);
+        JacksonJsonDeserializer<RejectingDriverDto> deserializer = new JacksonJsonDeserializer<>(RejectingDriverDto.class);
+
+        deserializer.setUseTypeHeaders(false);
+        deserializer.addTrustedPackages("*");
+
+        return new DefaultKafkaConsumerFactory<>(
+                configProps,
+                new StringDeserializer(),
+                deserializer
+        );
+        // return new DefaultKafkaConsumerFactory<>(configProps);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, RejectingDriverDto> kafkaListenerContainerFactory1(){
+        ConcurrentKafkaListenerContainerFactory<String, RejectingDriverDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactoryRejectingDrivers());
         return factory;
     }
 
